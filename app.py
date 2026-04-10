@@ -4,7 +4,7 @@ import itertools
 # ==========================================
 # PHẦN 0: KHỞI TẠO CẤU HÌNH TRANG
 # ==========================================
-st.set_page_config(page_title="CSDL Normalization App", layout="wide", page_icon="🗄️")
+st.set_page_config(page_title="CSDL Normalization App", layout="wide", page_icon="")
 
 # ==========================================
 # PHẦN 1: TẤT CẢ CÁC THUẬT TOÁN (CORE LÕI)
