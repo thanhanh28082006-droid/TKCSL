@@ -4,9 +4,9 @@ import itertools
 # ==========================================
 # PHẦN 1: CÁC HÀM XỬ LÝ LÕI (ALGORITHMS)
 # ==========================================
-# (Giữ nguyên các thuật toán chuẩn như cũ)
 
 def parse_input(u_str, f_str):
+    # Lọc bỏ dấu phẩy và khoảng trắng để lấy các chữ cái
     U = set(u_str.replace(" ", "").replace(",", "")) if u_str else set()
     F = []
     if f_str:
@@ -14,7 +14,7 @@ def parse_input(u_str, f_str):
         for dep in deps:
             if '->' in dep:
                 lhs, rhs = dep.split('->')
-                F.append((set(lhs), set(rhs)))
+                F.append((set(lhs.strip()), set(rhs.strip())))
     return U, F
 
 def get_closure(X, F):
@@ -64,7 +64,7 @@ def check_normal_forms(U, F, keys):
     non_prime_attrs = U - prime_attrs
     steps_log = []
     
-    steps_log.append("✅ **1NF:** Mặc định Lược đồ đạt 1NF (các thuộc tính đều đơn trị).")
+    steps_log.append("✅ **1NF:** Mặc định Lược đồ đạt 1NF.")
     
     # Kiểm tra 2NF
     for lhs, rhs in F:
@@ -73,8 +73,8 @@ def check_normal_forms(U, F, keys):
             for k in keys:
                 if lhs.issubset(k) and lhs != k:
                     violator = f"{''.join(sorted(lhs))} -> {''.join(sorted(rhs))}"
-                    steps_log.append(f"❌ **2NF:** Lược đồ KHÔNG đạt 2NF.")
-                    steps_log.append(f"> Tồn tại phụ thuộc hàm `{violator}` vi phạm: Thuộc tính không khóa `{''.join(sorted(rhs_non_prime))}` phụ thuộc vào một phần của khóa `{''.join(sorted(k))}`.")
+                    steps_log.append(f"❌ **2NF:** KHÔNG đạt 2NF.")
+                    steps_log.append(f"> Thuộc tính không khóa `{''.join(sorted(rhs_non_prime))}` phụ thuộc vào một phần của khóa (`{violator}`).")
                     return "1NF", prime_attrs, non_prime_attrs, steps_log
     
     steps_log.append("✅ **2NF:** Lược đồ đạt 2NF (Không có phụ thuộc từng phần).")
@@ -88,8 +88,8 @@ def check_normal_forms(U, F, keys):
         
         if not is_superkey and not is_rhs_prime:
             violator = f"{''.join(sorted(lhs))} -> {''.join(sorted(rhs))}"
-            steps_log.append(f"❌ **3NF:** Lược đồ KHÔNG đạt 3NF.")
-            steps_log.append(f"> Tồn tại phụ thuộc hàm `{violator}` vi phạm: Vế trái không phải siêu khóa, vế phải không phải thuộc tính khóa.")
+            steps_log.append(f"❌ **3NF:** KHÔNG đạt 3NF.")
+            steps_log.append(f"> Vế trái không phải siêu khóa, vế phải không phải thuộc tính khóa (`{violator}`).")
             return "2NF", prime_attrs, non_prime_attrs, steps_log
             
     steps_log.append("✅ **3NF:** Lược đồ đạt 3NF (Không có phụ thuộc bắc cầu).")
@@ -97,61 +97,51 @@ def check_normal_forms(U, F, keys):
 
 
 # ==========================================
-# PHẦN 2: GIAO DIỆN STREAMLIT (UI CHIA 2 BÊN)
+# PHẦN 2: GIAO DIỆN (UI CHIA 2 BÊN CỐ ĐỊNH)
 # ==========================================
 
-# Cài đặt trang ở chế độ "wide" để có không gian chia cột
 st.set_page_config(page_title="CSDL Lab", layout="wide", page_icon="🗄️")
-
 st.title("🗄️ CSDL Lab: Lý Thuyết & Thực Hành")
 st.markdown("---")
 
-# TẠO LAYOUT CHIA 2 CỘT (Tỷ lệ 4:6 để bên Test rộng rãi hơn gõ code)
+# TẠO LAYOUT CHIA 2 CỘT (Tỷ lệ 4:6)
 col_lib, col_gap, col_test = st.columns([4, 0.2, 6])
 
 # ---------------------------------------------------------
-# BÊN TRÁI: THƯ VIỆN SÁCH (LÝ THUYẾT & CHỌN CHỦ ĐỀ)
+# BÊN TRÁI: THƯ VIỆN SÁCH (HIỂN THỊ TẤT CẢ LÝ THUYẾT)
 # ---------------------------------------------------------
 with col_lib:
-    st.header("📚 Thư Viện Lý Thuyết")
-    st.info("Chọn một chủ đề bên dưới để xem lý thuyết và mở khóa chức năng test tương ứng ở cột bên phải.")
-    
-    # Dùng radio button làm Menu điều hướng ngay trong cột
-    topic = st.radio(
-        "MỤC LỤC BÀI HỌC:",
-        ["1. Tính Bao Đóng (Closure)", "2. Tìm Khóa (Keys)", "3. Chuẩn Hóa (Normal Forms)"]
-    )
-    
-    st.divider()
-    
-    # Hiển thị nội dung sách tương ứng với chủ đề được chọn
-    if topic == "1. Tính Bao Đóng (Closure)":
-        st.subheader("Bao đóng của tập thuộc tính ($X^+$)")
-        st.write("Bao đóng của $X$ là tập hợp TẤT CẢ các thuộc tính có thể được suy dẫn logic từ $X$ thông qua tập phụ thuộc hàm $F$.")
-        st.caption("💡 Ứng dụng: Dùng để kiểm tra tính suy diễn của một phụ thuộc hàm (xem nó có đúng hay không).")
+    st.header("📚 Thư Viện Sách")
+    # Sử dụng container có height để tạo thanh cuộn độc lập cho cuốn sách
+    with st.container(height=800):
+        st.markdown("""
+        ### 1. Tính Bao Đóng ($X^+$)
+        Bao đóng của $X$ (ký hiệu $X^+$) là tập hợp TẤT CẢ các thuộc tính có thể được suy dẫn logic từ $X$ thông qua tập phụ thuộc hàm $F$.
+        * **Ứng dụng:** Dùng để kiểm tra xem một phụ thuộc hàm có được suy dẫn từ F hay không.
         
-    elif topic == "2. Tìm Khóa (Keys)":
-        st.subheader("Khóa của Lược đồ")
-        st.write("Một tập thuộc tính $K$ được gọi là **Khóa** nếu thỏa mãn 2 điều kiện:")
-        st.markdown("- **Tính xác định duy nhất:** $K^+ = U$ (K đẻ ra được tất cả).")
-        st.markdown("- **Tính tối thiểu:** Bất kỳ tập con thực sự nào của $K$ cũng không thể đẻ ra được $U$. (Nếu dư thừa chữ cái, nó bị giáng cấp xuống thành *Siêu khóa*).")
-        st.caption("💡 Thuật toán: Dùng phương pháp phân loại thuộc tính (Tập nguồn, Trung gian) và kẻ bảng nhị phân.")
+        ---
+        ### 2. Tìm Khóa Của Lược Đồ
+        Một tập thuộc tính $K$ được gọi là **Khóa** nếu thỏa mãn:
+        1. **Tính xác định duy nhất:** $K^+ = U$ (K đẻ ra được tất cả).
+        2. **Tính tối thiểu:** Bất kỳ tập con thực sự nào của $K$ cũng không thể đẻ ra được $U$. 
+        * **Thuật toán áp dụng:** Phương pháp phân loại thuộc tính (Tập nguồn, Tập trung gian, Tập đích) kết hợp lập bảng đường chạy nhị phân.
         
-    elif topic == "3. Chuẩn Hóa (Normal Forms)":
-        st.subheader("Các Dạng Chuẩn Cơ Bản")
-        st.markdown("- **1NF:** Mọi giá trị đều nguyên tử.")
-        st.markdown("- **2NF:** Đạt 1NF và **Không có phụ thuộc từng phần** (Thuộc tính không khóa không được phép "ăn bám" vào một mảnh vỡ của khóa chính).")
-        st.markdown("- **3NF:** Đạt 2NF và **Không có phụ thuộc bắc cầu** ($A \\rightarrow B \\rightarrow C$).")
+        ---
+        ### 3. Chuẩn Hóa Lược Đồ (Normal Forms)
+        * **Dạng chuẩn 1 (1NF):** Mọi giá trị đều là nguyên tử (không chứa đa trị). Mặc định luôn đạt.
+        * **Dạng chuẩn 2 (2NF):** Đạt 1NF và **Không có phụ thuộc từng phần**. Thuộc tính không khóa không được phép "ăn bám" vào một mảnh vỡ của khóa chính ghép.
+        * **Dạng chuẩn 3 (3NF):** Đạt 2NF và **Không có phụ thuộc bắc cầu** ($A \\rightarrow B \\rightarrow C$). Điều kiện kiểm tra: Mọi phụ thuộc hàm $X \\rightarrow Y$, hoặc $X$ là siêu khóa, hoặc $Y$ là thuộc tính khóa.
+        """)
 
 # ---------------------------------------------------------
-# BÊN PHẢI: PLAYGROUND (KHU VỰC TEST)
+# BÊN PHẢI: KHU VỰC TEST (HIỂN THỊ TẤT CẢ CHỨC NĂNG)
 # ---------------------------------------------------------
 with col_test:
     st.header("⚙️ Khu Vực Test Thuật Toán")
     
-    # Form nhập dữ liệu chung (Lúc nào cũng hiện)
+    # 1. Box nhập liệu dùng chung cho mọi chức năng
     with st.container(border=True):
-        st.markdown("**1. Nhập Dữ Liệu Đầu Vào**")
+        st.markdown("##### 📥 1. Nhập Dữ Liệu Đầu Vào")
         c1, c2 = st.columns(2)
         with c1:
             u_input = st.text_input("Tập Thuộc Tính U:", "A, B, C, D, E")
@@ -162,41 +152,39 @@ with col_test:
 
     st.markdown("<br>", unsafe_allow_html=True) # Khoảng trắng
 
-    # Logic Test thay đổi theo Chủ đề được chọn bên Thư viện
     if not U or not F:
         st.warning("👈 Vui lòng nhập U và F ở trên để bắt đầu test!")
     else:
-        if topic == "1. Tính Bao Đóng (Closure)":
-            with st.container(border=True):
-                st.markdown(f"**2. Test: Tính $X^+$**")
-                x_input = st.text_input("Nhập tập X cần tính (VD: AB):", "A, D")
-                if st.button("▶ Tính Toán", type="primary"):
-                    X = set(x_input.replace(" ", "").replace(",", ""))
-                    res = get_closure(X, F)
-                    st.success(f"**Kết quả:** $({x_input})^+ = \{{ {', '.join(sorted(res))} \}}$")
-                    
-        elif topic == "2. Tìm Khóa (Keys)":
-            with st.container(border=True):
-                st.markdown(f"**2. Test: Tìm tất cả khóa của Lược đồ**")
-                if st.button("▶ Chạy Thuật Toán", type="primary"):
-                    all_keys = find_all_keys(U, F)
-                    st.success(f"**Lược đồ có {len(all_keys)} khóa:**")
-                    for i, k in enumerate(all_keys):
-                        st.write(f"🔑 Khóa $K_{i+1} = \{{ { ''.join(sorted(k)) } \}}$")
+        # 2. Box tính Bao Đóng
+        with st.container(border=True):
+            st.markdown("##### 🧩 2. Tính Bao Đóng ($X^+$)")
+            x_input = st.text_input("Nhập tập X cần tính (VD: AD):", "A, D")
+            if st.button("▶ Tính Bao Đóng", type="primary"):
+                X = set(x_input.replace(" ", "").replace(",", ""))
+                res = get_closure(X, F)
+                st.success(f"**Kết quả:** $({x_input})^+ = \{{ {', '.join(sorted(res))} \}}$")
+                
+        # 3. Box Tìm Khóa
+        with st.container(border=True):
+            st.markdown("##### 🔑 3. Tìm Tất Cả Các Khóa")
+            if st.button("▶ Chạy Thuật Toán Tìm Khóa", type="primary"):
+                all_keys = find_all_keys(U, F)
+                st.success(f"**Lược đồ có {len(all_keys)} khóa:**")
+                for i, k in enumerate(all_keys):
+                    st.write(f"- Khóa $K_{i+1} = \{{ { ''.join(sorted(k)) } \}}$")
 
-        elif topic == "3. Chuẩn Hóa (Normal Forms)":
-            with st.container(border=True):
-                st.markdown(f"**2. Test: Phân tích Dạng Chuẩn**")
-                if st.button("▶ Bắt đầu Kiểm Tra", type="primary"):
-                    keys = find_all_keys(U, F)
-                    key_strs = ["{" + "".join(sorted(k)) + "}" for k in keys]
-                    st.write(f"**Khóa của lược đồ:** {', '.join(key_strs)}")
-                    
-                    highest_nf, prime, non_prime, logs = check_normal_forms(U, F, keys)
-                    
-                    # In log từng bước
-                    with st.expander("Xem chi tiết các bước biện luận", expanded=True):
-                        for log in logs:
-                            st.write(log)
-                            
-                    st.success(f"🏆 **KẾT LUẬN: Lược đồ đạt dạng chuẩn {highest_nf}**")
+        # 4. Box Dạng Chuẩn
+        with st.container(border=True):
+            st.markdown("##### 🔍 4. Phân Tích Dạng Chuẩn")
+            if st.button("▶ Bắt đầu Kiểm Tra", type="primary"):
+                keys = find_all_keys(U, F)
+                key_strs = ["{" + "".join(sorted(k)) + "}" for k in keys]
+                st.write(f"**🔑 Khóa của lược đồ:** {', '.join(key_strs)}")
+                
+                highest_nf, prime, non_prime, logs = check_normal_forms(U, F, keys)
+                
+                # In log từng bước
+                for log in logs:
+                    st.write(log)
+                        
+                st.success(f"🏆 **KẾT LUẬN: Lược đồ đạt dạng chuẩn {highest_nf}**")
