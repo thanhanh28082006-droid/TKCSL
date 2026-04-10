@@ -105,21 +105,24 @@ def check_normal_forms(U, F, keys):
 
 
 # ==========================================
-# PHẦN 2: ĐIỀU HƯỚNG TRANG (SIDEBAR MENU)
+# PHẦN 2: ĐIỀU HƯỚNG TRANG (CĂN GIỮA MÀN HÌNH)
 # ==========================================
-with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/2875/2875693.png", width=80)
-    st.title("MENU HỆ THỐNG")
-    
-    # ĐÂY CHÍNH LÀ NÚT CHUYỂN TRANG
+
+st.markdown("<h1 style='text-align: center;'>🗄️ HỆ THỐNG THIẾT KẾ CƠ SỞ DỮ LIỆU</h1>", unsafe_allow_html=True)
+
+# Dùng 3 cột để ép Menu Radio vào giữa màn hình
+col_nav1, col_nav2, col_nav3 = st.columns([1, 2, 1])
+
+with col_nav2:
     page = st.radio(
-        "Chọn chức năng:",
-        ["🧮 Trang 1: Demo Thuật Toán", "📚 Trang 2: Thư Viện Test Case"]
+        "Điều hướng:",
+        ["🧮 Phần 1: Demo Thuật Toán", "📚 Phần 2: Thư Viện Test Case"],
+        horizontal=True, # Hiển thị nút bấm theo chiều ngang
+        label_visibility="collapsed" # Ẩn chữ "Điều hướng:" đi cho đẹp
     )
-    
-    st.markdown("---")
-    st.caption("Sinh viên: Thanh")
-    st.caption("Trường: UTH")
+
+st.markdown("---")
+
 
 # ==========================================
 # PHẦN 3: GIAO DIỆN TỪNG TRANG
@@ -128,8 +131,8 @@ with st.sidebar:
 # -----------------------------------------------------
 # GIAO DIỆN TRANG 1: DEMO THUẬT TOÁN (PLAYGROUND)
 # -----------------------------------------------------
-if page == "🧮 Trang 1: Demo Thuật Toán":
-    st.title("🧮 Môi Trường Chạy Code (Playground)")
+if page == "🧮 Phần 1: Demo Thuật Toán":
+    st.subheader("🧮 Môi Trường Chạy Code (Playground)")
     st.markdown("Nhập trực tiếp dữ liệu Lược đồ để kiểm tra các thuật toán cốt lõi.")
     
     with st.container(border=True):
@@ -171,19 +174,22 @@ if page == "🧮 Trang 1: Demo Thuật Toán":
 # -----------------------------------------------------
 # GIAO DIỆN TRANG 2: THƯ VIỆN TEST CASE
 # -----------------------------------------------------
-elif page == "📚 Trang 2: Thư Viện Test Case":
-    st.title("📚 Thư Viện Bài Tập & Người Dùng")
+elif page == "📚 Phần 2: Thư Viện Test Case":
+    st.subheader("📚 Thư Viện Bài Tập Mẫu")
     
-    # 1. Khởi tạo Database giả lập
+    # 1. Database giả lập (Đã đổi thành tên Bài Tập chung chung)
     db = {
-        "Vũ Đức Long (Đề Thi Cuối Kỳ)": {
+        "Bài Tập 1 (Test 2NF)": {
             "u": "A, B, C, D", "f": "AB->D, C->D", "note": "Bài này Q không đạt 2NF"
         },
-        "Trần Khả Ái (Bài Tập Lớn)": {
+        "Bài Tập 2 (Nhiều Khóa)": {
             "u": "A, B, C, D, E", "f": "AB->C, CD->E, DE->B", "note": "Bài khó, có tận 3 khóa"
         },
-        "Nguyễn Văn A (Test Dạng Chuẩn 3)": {
-            "u": "A, B, C, D, E, G", "f": "AB->C, AC->D, D->EG, G->B, A->D, CG->A", "note": "Bài này lằng nhằng, cần test cẩn thận"
+        "Bài Tập 3 (Lược đồ 6 thuộc tính)": {
+            "u": "A, B, C, D, E, G", "f": "AB->C, AC->D, D->EG, G->B, A->D, CG->A", "note": "Đề thi phức tạp, cần test cẩn thận"
+        },
+        "Bài Tập 4 (Tìm 1 Khóa)": {
+            "u": "A, B, C, D, E", "f": "DE->A, B->C, E->AD", "note": "Lược đồ cơ bản chỉ có 1 khóa duy nhất"
         }
     }
     
@@ -192,7 +198,7 @@ elif page == "📚 Trang 2: Thư Viện Test Case":
     
     with col_list:
         st.markdown("#### 📁 Chọn Bài Tập")
-        selected_case = st.radio("Danh sách Test Case:", options=list(db.keys()), label_visibility="collapsed")
+        selected_case = st.radio("Danh sách Bài Tập:", options=list(db.keys()), label_visibility="collapsed")
         st.info(f"**Ghi chú:** {db[selected_case]['note']}")
         
     with col_action:
@@ -211,7 +217,7 @@ elif page == "📚 Trang 2: Thư Viện Test Case":
         U2, F2 = parse_input(u_in, f_in)
         
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("#### 🚀 Action (Thực Thi)")
+        st.markdown("#### 🚀 Bảng Điều Khiển Thực Thi")
         
         # Các nút bấm chạy thẳng thuật toán
         btn1, btn2 = st.columns(2)
