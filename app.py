@@ -108,7 +108,7 @@ def check_normal_forms(U, F, keys):
 # PHẦN 2: ĐIỀU HƯỚNG TRANG (CĂN GIỮA MÀN HÌNH)
 # ==========================================
 
-st.markdown("<h1 style='text-align: center;'>🗄️ HỆ THỐNG THIẾT KẾ CƠ SỞ DỮ LIỆU</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🗄️ Test TKCSDLHT</h1>", unsafe_allow_html=True)
 
 # Dùng 3 cột để ép Menu Radio vào giữa màn hình
 col_nav1, col_nav2, col_nav3 = st.columns([1, 2, 1])
@@ -116,7 +116,7 @@ col_nav1, col_nav2, col_nav3 = st.columns([1, 2, 1])
 with col_nav2:
     page = st.radio(
         "Điều hướng:",
-        ["🧮 Phần 1: Demo Thuật Toán", "📚 Phần 2: Thư Viện Test Case"],
+        ["🧮 Phần 1: Demo Thuật Toán", "📚 Phần 2: Thư Viện Test Case "],
         horizontal=True, # Hiển thị nút bấm theo chiều ngang
         label_visibility="collapsed" # Ẩn chữ "Điều hướng:" đi cho đẹp
     )
@@ -132,8 +132,8 @@ st.markdown("---")
 # GIAO DIỆN TRANG 1: DEMO THUẬT TOÁN (PLAYGROUND)
 # -----------------------------------------------------
 if page == "🧮 Phần 1: Demo Thuật Toán":
-    st.subheader("🧮 Môi Trường Chạy Code (Playground)")
-    st.markdown("Nhập trực tiếp dữ liệu Lược đồ để kiểm tra các thuật toán cốt lõi.")
+    st.subheader("🧮 Chạy các thuật toán ")
+    st.markdown("Nhập dữ liệu để test nhé.")
     
     with st.container(border=True):
         c1, c2 = st.columns(2)
