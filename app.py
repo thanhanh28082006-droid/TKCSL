@@ -100,26 +100,26 @@ def check_normal_forms(U, F, keys):
 
 
 # ==========================================
-# PHẦN 2: DỮ LIỆU GIẢ LẬP (MOCK DATA)
+# PHẦN 2: THƯ VIỆN TEST CASE (MOCK DATA)
 # ==========================================
 db_mock_data = {
-    "Bài 1: Slide Thầy": {
-        "desc": "Bài kiểm tra Q không đạt 2NF",
+    "Vũ Đức Long (Bài 1)": {
+        "desc": "Bài kiểm tra lược đồ Q không đạt 2NF",
         "u_data": "A, B, C, D",
         "f_data": "AB->D, C->D"
     },
-    "Bài 2: Test 3NF": {
-        "desc": "Bài có 3 khóa, test xem đạt dạng chuẩn mấy",
+    "Trần Khả Ái (Bài 2)": {
+        "desc": "Bài có 3 khóa, test dạng chuẩn nâng cao",
         "u_data": "A, B, C, D, E",
         "f_data": "AB->C, CD->E, DE->B"
     },
-    "Bài 3: Lược đồ lớn": {
+    "Nguyễn Văn A (Bài 3)": {
         "desc": "Đề thi: Tìm khóa lược đồ 6 thuộc tính",
         "u_data": "A, B, C, D, E, G",
         "f_data": "AB->C, AC->D, D->EG, G->B, A->D, CG->A"
     },
-    "Tự nhập dữ liệu...": {
-        "desc": "Khu vực tự do gõ đề bài mới",
+    "➕ Tự nhập dữ liệu mới...": {
+        "desc": "Khu vực tự do gõ đề bài mới để test",
         "u_data": "",
         "f_data": ""
     }
@@ -127,90 +127,88 @@ db_mock_data = {
 
 
 # ==========================================
-# PHẦN 3: GIAO DIỆN (UI CHIA 2 BÊN)
+# PHẦN 3: GIAO DIỆN (UI SIDEBAR VÀ MAIN)
 # ==========================================
 
-st.set_page_config(page_title="Hệ Thống Thiết Kế CSDL", layout="wide", page_icon="🗄️")
-st.title("🗄️ Quản Lý Bài Tập CSDL (Normal Forms)")
-st.markdown("---")
-
-# CHIA LAYOUT (Trái 3 phần, Phải 7 phần)
-col_list, col_gap, col_detail = st.columns([3, 0.5, 6.5])
+st.set_page_config(page_title="CSDL Testing System", layout="wide", page_icon="🗄️")
 
 # -----------------------------------------
-# CỘT TRÁI: DANH SÁCH BÀI TẬP (MASTER)
+# BÊN TRÁI: KHU VỰC SIDEBAR (DANH SÁCH TEST)
 # -----------------------------------------
-with col_list:
-    st.markdown("### 📚 Thư Viện Bài Tập")
-    st.caption("Chọn một bài để load dữ liệu tự động:")
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/2875/2875693.png", width=100) # Thêm cái icon cho ngầu
+    st.title("📚 THƯ VIỆN TEST")
+    st.markdown("---")
     
-    # Dùng radio button để làm danh sách chọn
+    # Danh sách các bài test dưới dạng Radio Button
     selected_name = st.radio(
-        "Danh sách Test Case:",
-        options=list(db_mock_data.keys()),
-        label_visibility="collapsed"
+        "MỤC LỤC BÀI HỌC / TEST CASE:",
+        options=list(db_mock_data.keys())
     )
+    
+    st.markdown("---")
+    st.caption("💡 Mẹo: Chọn một tên/bài ở trên, dữ liệu sẽ tự động được nạp vào công cụ bên phải.")
 
 # -----------------------------------------
-# CỘT PHẢI: CHI TIẾT & KHU VỰC TEST (DETAIL)
+# BÊN PHẢI: KHU VỰC CHÍNH (CÔNG CỤ THAO TÁC)
 # -----------------------------------------
-with col_detail:
-    user_info = db_mock_data[selected_name]
+# Lấy dữ liệu tương ứng với mục được chọn ở Sidebar
+user_info = db_mock_data[selected_name]
+
+st.title("⚙️ HỆ THỐNG PHÂN TÍCH LƯỢC ĐỒ")
+st.markdown(f"**Đang thao tác:** `{selected_name}` — *{user_info['desc']}*")
+st.divider()
+
+# Ô nhập liệu (nạp sẵn dữ liệu, có thể sửa được)
+st.markdown("### 1. Dữ Liệu Đầu Vào (U, F)")
+c1, c2 = st.columns(2)
+with c1:
+    u_input = st.text_input("Tập Thuộc Tính U:", value=user_info['u_data'])
+with c2:
+    f_input = st.text_input("Tập Phụ Thuộc Hàm F:", value=user_info['f_data'])
     
-    # Header
-    st.markdown(f"### 🎯 Đang thao tác: {selected_name}")
-    st.caption(f"📝 Mô tả: {user_info['desc']}")
+U, F = parse_input(u_input, f_input)
+
+if not U or not F:
+    st.warning("👈 Vui lòng nhập U và F để sử dụng các công cụ bên dưới!")
+else:
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("### 2. Bảng Điều Khiển Thuật Toán")
     
-    st.divider()
+    # CÁC CÔNG CỤ TEST (Dùng Tabs cho gọn gàng, bấm vào thuật toán nào là xài thuật toán đó)
+    tab1, tab2, tab3 = st.tabs(["🧩 Tính Bao Đóng", "🔑 Tìm Khóa", "🔍 Kiểm Tra Dạng Chuẩn"])
     
-    # Ô nhập liệu (có thể sửa được nếu muốn)
-    st.markdown("#### ⚙️ Dữ Liệu Lược Đồ (U, F)")
-    c1, c2 = st.columns(2)
-    with c1:
-        u_input = st.text_input("Tập Thuộc Tính U:", value=user_info['u_data'])
-    with c2:
-        f_input = st.text_input("Tập Phụ Thuộc Hàm F:", value=user_info['f_data'])
-        
-    U, F = parse_input(u_input, f_input)
-    
-    if not U or not F:
-        st.warning("👈 Vui lòng nhập U và F để sử dụng các công cụ bên dưới!")
-    else:
-        st.markdown("<br>", unsafe_allow_html=True)
-        
-        # CÁC CÔNG CỤ TEST (Dùng Tabs cho gọn gàng)
-        tab1, tab2, tab3 = st.tabs(["🧩 1. Tính Bao Đóng", "🔑 2. Tìm Khóa", "🔍 3. Dạng Chuẩn"])
-        
-        with tab1:
-            st.markdown("**Thuật toán: Tính Bao Đóng ($X^+$)**")
-            x_in = st.text_input("Nhập tập X cần tính (VD: AB):", key="x_input")
-            if st.button("▶ Chạy Tính Bao Đóng", type="primary"):
-                if x_in:
-                    X = set(x_in.replace(" ", "").replace(",", ""))
-                    res = get_closure(X, F)
-                    st.success(f"**Kết quả:** $({x_in})^+ = \{{ {', '.join(sorted(res))} \}}$")
-                else:
-                    st.error("Vui lòng nhập X!")
+    with tab1:
+        st.markdown("**Thuật toán: Tính Bao Đóng ($X^+$)**")
+        x_in = st.text_input("Nhập tập X cần tính (VD: AB):", key="x_input")
+        if st.button("▶ Chạy Tính Bao Đóng", type="primary"):
+            if x_in:
+                X = set(x_in.replace(" ", "").replace(",", ""))
+                res = get_closure(X, F)
+                st.success(f"**Kết quả:** $({x_in})^+ = \{{ {', '.join(sorted(res))} \}}$")
+            else:
+                st.error("Vui lòng nhập X!")
+                
+    with tab2:
+        st.markdown("**Thuật toán: Tìm Tất cả các Khóa bằng Phương pháp Nhị phân**")
+        if st.button("▶ Chạy Tìm Khóa", type="primary"):
+            all_keys = find_all_keys(U, F)
+            st.success(f"**Lược đồ có {len(all_keys)} khóa:**")
+            for i, k in enumerate(all_keys):
+                st.write(f"- Khóa $K_{i+1} = \{{ { ''.join(sorted(k)) } \}}$")
+
+    with tab3:
+        st.markdown("**Thuật toán: Phân tích 1NF, 2NF, 3NF**")
+        if st.button("▶ Bắt đầu Kiểm Tra Chuẩn Hóa", type="primary"):
+            keys = find_all_keys(U, F)
+            key_strs = ["{" + "".join(sorted(k)) + "}" for k in keys]
+            st.write(f"**🔑 Các khóa đã tìm được:** {', '.join(key_strs)}")
+            
+            highest_nf, prime, non_prime, logs = check_normal_forms(U, F, keys)
+            
+            # Khung hiển thị log biện luận chi tiết
+            with st.expander("📝 Xem chi tiết các bước biện luận", expanded=True):
+                for log in logs:
+                    st.write(log)
                     
-        with tab2:
-            st.markdown("**Thuật toán: Tìm Tất cả các Khóa**")
-            if st.button("▶ Chạy Tìm Khóa", type="primary"):
-                all_keys = find_all_keys(U, F)
-                st.success(f"**Lược đồ có {len(all_keys)} khóa:**")
-                for i, k in enumerate(all_keys):
-                    st.write(f"- Khóa $K_{i+1} = \{{ { ''.join(sorted(k)) } \}}$")
-
-        with tab3:
-            st.markdown("**Thuật toán: Phân tích 1NF, 2NF, 3NF**")
-            if st.button("▶ Bắt đầu Kiểm Tra Chuẩn Hóa", type="primary"):
-                keys = find_all_keys(U, F)
-                key_strs = ["{" + "".join(sorted(k)) + "}" for k in keys]
-                st.write(f"**🔑 Các khóa đã tìm được:** {', '.join(key_strs)}")
-                
-                highest_nf, prime, non_prime, logs = check_normal_forms(U, F, keys)
-                
-                with st.expander("Xem chi tiết các bước biện luận", expanded=True):
-                    for log in logs:
-                        st.write(log)
-                        
-                st.success(f"🏆 **KẾT LUẬN: Lược đồ đạt dạng chuẩn {highest_nf}**")
+            st.success(f"🏆 **KẾT LUẬN: Lược đồ đạt dạng chuẩn {highest_nf}**")
